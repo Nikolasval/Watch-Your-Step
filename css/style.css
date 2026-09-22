@@ -341,6 +341,57 @@ kbd {
   background-size: contain;
 }
 
+.touch-controls {
+  display: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .touch-controls {
+    display: flex;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: clamp(10px, 3vw, 22px);
+    justify-content: space-between;
+    padding: 0 clamp(10px, 3vw, 24px);
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  .touch-group {
+    display: flex;
+    align-items: flex-end;
+    gap: clamp(10px, 2.5vw, 18px);
+    pointer-events: auto;
+  }
+
+  .touch-btn {
+    width: clamp(52px, 13vw, 68px);
+    height: clamp(52px, 13vw, 68px);
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    background: rgba(0, 0, 0, 0.38);
+    color: #fff;
+    font-size: clamp(20px, 5vw, 28px);
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .touch-btn:active {
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .touch-btn-jump {
+    width: clamp(64px, 17vw, 84px);
+    height: clamp(64px, 17vw, 84px);
+    font-size: clamp(24px, 6vw, 32px);
+  }
+}
+
 @media (max-width: 1000px) {
   body {
     flex-direction: column;

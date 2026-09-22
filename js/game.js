@@ -608,6 +608,26 @@
   cvs.addEventListener('pointercancel', function () { player.ducking = false; });
   cvs.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 
+  function bindHoldButton(btn, onDown, onUp) {
+    if (!btn) return;
+    btn.addEventListener('pointerdown', function (e) {
+      e.preventDefault();
+      try { btn.setPointerCapture(e.pointerId); } catch (err) {}
+      onDown();
+    });
+    btn.addEventListener('pointerup', onUp);
+    btn.addEventListener('pointercancel', onUp);
+    btn.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  }
+
+  bindHoldButton(document.getElementById('jump-btn'), startOrJump, releaseJump);
+  bindHoldButton(document.getElementById('duck-btn'), function () {
+    if (state === PLAYING) player.ducking = true;
+    else startOrJump();
+  }, function () { player.ducking = false; });
+  bindHoldButton(document.getElementById('boost-btn'), function () { boosting = true; }, function () { boosting = false; });
+  bindHoldButton(document.getElementById('slow-btn'), function () { slowing = true; }, function () { slowing = false; });
+
   window.addEventListener('blur', function () { paused = true; });
   window.addEventListener('focus', function () { paused = false; });
   document.addEventListener('visibilitychange', function () {

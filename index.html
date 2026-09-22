@@ -41,6 +41,7 @@
         <span><kbd>&larr;</kbd> slow down</span>
         <span><kbd>M</kbd> mute</span>
         <span>tap upper area to jump, lower strip to duck</span>
+        <span>on touch devices, on-screen buttons appear for jump, duck, boost, and slow</span>
       </div>
     </div>
   </div>
@@ -85,6 +86,16 @@
       <button id="pause-btn" type="button" aria-haspopup="dialog" aria-controls="pause-panel">Pause</button>
     </div>
     <canvas id="game" width="1200" height="420" aria-label="Shoe running game"></canvas>
+    <div class="touch-controls" id="touch-controls">
+      <div class="touch-group touch-group-left">
+        <button id="slow-btn" class="touch-btn" type="button" aria-label="Slow down">&larr;</button>
+        <button id="duck-btn" class="touch-btn" type="button" aria-label="Duck">&darr;</button>
+      </div>
+      <div class="touch-group touch-group-right">
+        <button id="jump-btn" class="touch-btn touch-btn-jump" type="button" aria-label="Jump">&uarr;</button>
+        <button id="boost-btn" class="touch-btn" type="button" aria-label="Boost">&rarr;</button>
+      </div>
+    </div>
   </div>
 
 <script>
