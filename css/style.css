@@ -52,6 +52,9 @@ body {
 .wrap {
   position: relative;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   /* canvas is 1200x420 (2.86:1); cap width by viewport width, viewport
      height (so it never forces scrolling), and native resolution (so it
      never upscales past its actual pixel size and gets blurry) */
@@ -346,23 +349,24 @@ kbd {
 }
 
 @media (hover: none) and (pointer: coarse) {
+  .wrap {
+    /* leave room below the canvas for the button row so it doesn't
+       get pushed off-screen or force page scrolling */
+    max-width: min(1200px, 92vw, calc((100vh - 200px) * 2.86));
+  }
+
   .touch-controls {
     display: flex;
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: clamp(10px, 3vw, 22px);
+    position: static;
+    width: 100%;
     justify-content: space-between;
-    padding: 0 clamp(10px, 3vw, 24px);
-    pointer-events: none;
-    z-index: 20;
+    padding: clamp(10px, 3vw, 22px) clamp(10px, 3vw, 24px) 0;
   }
 
   .touch-group {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     gap: clamp(10px, 2.5vw, 18px);
-    pointer-events: auto;
   }
 
   .touch-btn {

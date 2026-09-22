@@ -9,7 +9,7 @@
   var ctx = cvs.getContext('2d');
 
   function resize() {
-    var dpr = Math.min(window.devicePixelRatio || 1, 3);
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
     cvs.width = Math.round(W * dpr);
     cvs.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -286,18 +286,28 @@
     ctx.restore();
   }
 
-  function drawGraveyardGround(y, dirtColor) {
-    ctx.fillStyle = dirtColor;
-    ctx.fillRect(0, y, W, 80);
-
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+  // dirt speckle texture, baked once instead of re-rolled with fresh
+  // Math.random() + fillRect calls every frame (was ~630 draw calls/frame)
+  var GRAVEYARD_NOISE_H = 80;
+  var graveyardNoise = document.createElement('canvas');
+  graveyardNoise.width = W;
+  graveyardNoise.height = GRAVEYARD_NOISE_H;
+  (function () {
+    var nctx = graveyardNoise.getContext('2d');
+    nctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
     for (var i = 0; i < W; i += 8) {
-      for (var j = 0; j < 80; j += 12) {
+      for (var j = 0; j < GRAVEYARD_NOISE_H; j += 12) {
         if (Math.random() > 0.6) {
-          ctx.fillRect(i + Math.random() * 6, y + j + Math.random() * 10, 3, 2);
+          nctx.fillRect(i + Math.random() * 6, j + Math.random() * 10, 3, 2);
         }
       }
     }
+  })();
+
+  function drawGraveyardGround(y, dirtColor) {
+    ctx.fillStyle = dirtColor;
+    ctx.fillRect(0, y, W, GRAVEYARD_NOISE_H);
+    ctx.drawImage(graveyardNoise, 0, y);
   }
 
   var SKELETON_BAND_TOP = 40, SKELETON_BAND_H = 30;
