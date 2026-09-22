@@ -39,8 +39,31 @@
 
   /* --------------------------------------------------------------- sprites */
 
+  // splits a flat '#' silhouette into shading zones (H=top highlight,
+  // S=heel counter / toe shadow, T=toe cap, M=midsole) so it reads as
+  // stitched panels instead of one dull block of color
+  function shadeSprite(rows, heelColEnd, toeColStart, topRows, soleRows, toeShadowRow) {
+    var total = rows.length;
+    return rows.map(function (row, r) {
+      var chars = row.split('');
+      for (var c = 0; c < chars.length; c++) {
+        if (chars[c] !== '#') continue;
+        if (r < topRows) chars[c] = 'H';
+        else if (r >= total - soleRows) chars[c] = 'M';
+        else if (c <= heelColEnd) chars[c] = 'S';
+        else if (c >= toeColStart) chars[c] = (r >= toeShadowRow) ? 'S' : 'T';
+        else chars[c] = '#';
+      }
+      return chars.join('');
+    });
+  }
+
+  function shadeOutsole(row) {
+    return row.split('').map(function (ch) { return ch === '#' ? 'O' : ch; }).join('');
+  }
+
   // high-top sneaker, facing right: collar at the left, toe box at the right
-  var SHOE_BODY = [
+  var SHOE_BODY = shadeSprite([
     '.#######..................',
     '#########.................',
     '#########.................',
@@ -60,15 +83,15 @@
     '##########################',
     '##########################',
     '##########################'
-  ];
+  ], 8, 19, 2, 3, 11);
 
   // last row is the outsole; swapping it gives a heel-toe walk cycle
-  var SHOE_STAND = SHOE_BODY.concat(['.########################.']);
-  var SHOE_RUN_A = SHOE_BODY.concat(['.........#################']);  // heel lifted
-  var SHOE_RUN_B = SHOE_BODY.concat(['#################.........']);  // toe lifted
+  var SHOE_STAND = SHOE_BODY.concat([shadeOutsole('.########################.')]);
+  var SHOE_RUN_A = SHOE_BODY.concat([shadeOutsole('.........#################')]);  // heel lifted
+  var SHOE_RUN_B = SHOE_BODY.concat([shadeOutsole('#################.........')]);  // toe lifted
 
   // the same shoe squashed flat
-  var DUCK_BODY = [
+  var DUCK_BODY = shadeSprite([
     '...######.....................',
     '.##########...................',
     '.#################............',
@@ -77,9 +100,9 @@
     '##############################',
     '##############################',
     '##############################'
-  ];
-  var DUCK_A = DUCK_BODY.concat(['..##########################..']);
-  var DUCK_B = DUCK_BODY.concat(['.##########################...']);
+  ], 8, 22, 2, 2, 4);
+  var DUCK_A = DUCK_BODY.concat([shadeOutsole('..##########################..')]);
+  var DUCK_B = DUCK_BODY.concat([shadeOutsole('.##########################...')]);
 
   // background-coloured cutouts, in sprite cells: [x, y, w, h]
   var SHOE_CUTS = [
@@ -107,6 +130,23 @@
         } else {
           c++;
         }
+      }
+    }
+  }
+
+  // like drawMap, but each distinct non-'.' character is its own color,
+  // so a sprite can shade multiple panels in a single pass
+  function drawShadedMap(map, x, y, scale, palette) {
+    for (var r = 0; r < map.length; r++) {
+      var row = map[r], c = 0;
+      while (c < row.length) {
+        var ch = row.charAt(c);
+        if (ch === '.') { c++; continue; }
+        var s = c;
+        while (c < row.length && row.charAt(c) === ch) c++;
+        ctx.fillStyle = palette[ch] || palette['#'];
+        ctx.fillRect(Math.round(x + s * scale), Math.round(y + r * scale),
+          Math.round((c - s) * scale), Math.round(scale));
       }
     }
   }
@@ -342,6 +382,9 @@
   var NIGHT = { bg: [26, 26, 46],    fg: [236, 236, 240], dim: [92, 92, 104] };
   var SHOE_RED = [231, 76, 60];      // red shoe
   var SHOE_WHITE = [255, 255, 255];  // white shoe
+  var SHOE_TOE_CAP = [224, 208, 182];  // cream rubber toe cap
+  var SHOE_MIDSOLE = [241, 236, 226]; // white/cream midsole strip
+  var SHOE_OUTSOLE = [58, 54, 50];    // dark rubber tread
   var PILE_BROWN = [74, 42, 22];     // dark chocolate pile
   var PILE_HIGHLIGHT = [122, 74, 42]; // lighter swirl highlight
   var FLY_BLACK = [44, 44, 44];      // fly color
@@ -358,6 +401,23 @@
       Math.round(a[0] + (b[0] - a[0]) * t) + ',' +
       Math.round(a[1] + (b[1] - a[1]) * t) + ',' +
       Math.round(a[2] + (b[2] - a[2]) * t) + ')';
+  }
+
+  function mixArr(a, b, t) {
+    return [
+      Math.round(a[0] + (b[0] - a[0]) * t),
+      Math.round(a[1] + (b[1] - a[1]) * t),
+      Math.round(a[2] + (b[2] - a[2]) * t)
+    ];
+  }
+
+  // nudges a color toward white (amt > 0) or black (amt < 0)
+  function shadeArr(rgb, amt) {
+    return mixArr(rgb, amt >= 0 ? [255, 255, 255] : [0, 0, 0], Math.abs(amt));
+  }
+
+  function rgbStr(rgb) {
+    return 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
   }
 
   /* ----------------------------------------------------------------- audio */
@@ -387,7 +447,7 @@
   var state, speed, distance, score, milestone, milestoneT;
   var obstacles, clouds, stars, particles, speckles, skeletons, graves;
   var nextSpawnIn, lastWasFly, night, moonX, flash, overT, dustT;
-  var paused = false, menuPause = false, boosting = false, boostMult = 1;
+  var paused = false, menuPause = false, boosting = false, slowing = false, boostMult = 1;
   var flyMult = 1, pileMult = 1;
 
   var hi = 0;
@@ -493,12 +553,18 @@
   var JUMP_KEYS = { Space: 1, ArrowUp: 1, KeyW: 1, Enter: 1 };
   var DUCK_KEYS = { ArrowDown: 1, KeyS: 1 };
   var BOOST_KEYS = { ArrowRight: 1 };
+  var SLOW_KEYS = { ArrowLeft: 1 };
 
   window.addEventListener('keydown', function (e) {
     if (e.code === 'KeyM') { muted = !muted; return; }
     if (BOOST_KEYS[e.code]) {
       e.preventDefault();
       boosting = true;
+      return;
+    }
+    if (SLOW_KEYS[e.code]) {
+      e.preventDefault();
+      slowing = true;
       return;
     }
     if (JUMP_KEYS[e.code]) {
@@ -514,6 +580,10 @@
   window.addEventListener('keyup', function (e) {
     if (BOOST_KEYS[e.code]) {
       boosting = false;
+      return;
+    }
+    if (SLOW_KEYS[e.code]) {
+      slowing = false;
       return;
     }
     if (JUMP_KEYS[e.code]) releaseJump();
@@ -640,7 +710,7 @@
 
   function update(dt) {
     // scenery drifts a little even on the ready screen
-    boostMult = boosting ? 2 : 1;
+    boostMult = boosting ? 2 : (slowing ? 0.5 : 1);
     var scroll = (state === PLAYING ? speed * boostMult : state === READY ? START_SPEED * 0.35 : 0) * dt;
 
     for (var ci = 0; ci < clouds.length; ci++) {
@@ -893,9 +963,20 @@
     }
     px = Math.round(player.x);
     py = Math.round(py);
-    // Draw shoe in red
-    var shoeColor = mix(SHOE_RED, night > 0.5 ? [90, 30, 20] : SHOE_RED, Math.min(night, 0.5) * 2);
-    drawMap(map, px, py, PX, shoeColor);
+    // Draw shoe with panel shading: bright vamp, dark heel counter,
+    // toe cap fading into shadow, cream midsole, dark outsole tread
+    var nightT = Math.min(night, 0.5) * 2;
+    var shoeRGB = mixArr(SHOE_RED, night > 0.5 ? [90, 30, 20] : SHOE_RED, nightT);
+    var toeCapRGB = mixArr(SHOE_TOE_CAP, [45, 38, 32], nightT);
+    var shoePalette = {
+      '#': rgbStr(shoeRGB),
+      'H': rgbStr(shadeArr(shoeRGB, 0.32)),
+      'S': rgbStr(shadeArr(shoeRGB, -0.34)),
+      'T': rgbStr(mixArr(shoeRGB, toeCapRGB, 0.55)),
+      'M': rgbStr(mixArr(SHOE_MIDSOLE, [70, 66, 62], nightT)),
+      'O': rgbStr(mixArr(SHOE_OUTSOLE, [20, 18, 16], nightT))
+    };
+    drawShadedMap(map, px, py, PX, shoePalette);
     drawCuts(cuts, px, py, PX, '#ffffff');
 
     // ---- particles
@@ -928,6 +1009,9 @@
     if (boosting && state === PLAYING) {
       ctx.textAlign = 'left';
       drawOutlinedText('BOOST', 24, 18);
+    } else if (slowing && state === PLAYING) {
+      ctx.textAlign = 'left';
+      drawOutlinedText('SLOW', 24, 18);
     }
 
     // ---- overlays

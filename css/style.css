@@ -1,6 +1,6 @@
 :root {
   --page-bg: #ffffff;
-  --ink: #535353;
+  --ink: #1a1a1a;
   --muted: #9a9a9a;
   --shoe-red: #e74c3c;
   --shoe-white: #ffffff;
@@ -13,7 +13,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --page-bg: #ffffff;
-    --ink: #d8d8d8;
+    --ink: #1a1a1a;
     --muted: #6b6b70;
     --shoe-red: #ff6b6b;
     --shoe-white: #f0f0f0;
