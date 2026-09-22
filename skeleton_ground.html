@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skeleton Graveyard</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f0f0f0;
+        }
+        svg {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <svg width="800" height="600" viewBox="0 0 800 600">
+        <!-- Blue Sky -->
+        <rect width="800" height="300" fill="#87CEEB"/>
+
+        <!-- Dirt Ground -->
+        <rect y="300" width="800" height="300" fill="#8B4513"/>
+
+        <!-- Grass line decoration -->
+        <line x1="0" y1="300" x2="800" y2="300" stroke="#2d5016" stroke-width="3"/>
+        <ellipse cx="50" cy="295" rx="8" ry="8" fill="#228B22"/>
+        <ellipse cx="120" cy="292" rx="10" ry="8" fill="#228B22"/>
+        <ellipse cx="200" cy="295" rx="9" ry="8" fill="#228B22"/>
+        <ellipse cx="280" cy="290" rx="11" ry="8" fill="#228B22"/>
+        <ellipse cx="380" cy="295" rx="8" ry="8" fill="#228B22"/>
+        <ellipse cx="480" cy="293" rx="10" ry="8" fill="#228B22"/>
+        <ellipse cx="580" cy="295" rx="9" ry="8" fill="#228B22"/>
+        <ellipse cx="680" cy="291" rx="11" ry="8" fill="#228B22"/>
+        <ellipse cx="750" cy="295" rx="8" ry="8" fill="#228B22"/>
+
+        <!-- Skeleton 1 - Left side, mostly buried -->
+        <!-- Skull peeking out -->
+        <circle cx="150" cy="400" r="25" fill="#FFFACD" stroke="#333" stroke-width="2"/>
+        <!-- Eye sockets -->
+        <circle cx="140" cy="395" r="6" fill="#333"/>
+        <circle cx="160" cy="395" r="6" fill="#333"/>
+        <!-- Nose hole -->
+        <polygon points="150,405 147,410 153,410" fill="#333"/>
+        <!-- Teeth -->
+        <line x1="138" y1="418" x2="162" y2="418" stroke="#333" stroke-width="2"/>
+        <line x1="140" y1="415" x2="140" y2="421" stroke="#333" stroke-width="1"/>
+        <line x1="145" y1="415" x2="145" y2="421" stroke="#333" stroke-width="1"/>
+        <line x1="150" y1="415" x2="150" y2="421" stroke="#333" stroke-width="1"/>
+        <line x1="155" y1="415" x2="155" y2="421" stroke="#333" stroke-width="1"/>
+        <line x1="160" y1="415" x2="160" y2="421" stroke="#333" stroke-width="1"/>
+
+        <!-- Skeleton 2 - Center, arm sticking up -->
+        <!-- Arm bone sticking up -->
+        <line x1="400" y1="320" x2="400" y2="250" stroke="#F5DEB3" stroke-width="12" stroke-linecap="round"/>
+        <!-- Hand bones -->
+        <circle cx="395" cy="240" r="6" fill="#F5DEB3" stroke="#333" stroke-width="1"/>
+        <circle cx="405" cy="235" r="6" fill="#F5DEB3" stroke="#333" stroke-width="1"/>
+        <!-- Skull buried deeper -->
+        <circle cx="420" cy="460" r="20" fill="#FFFACD" stroke="#333" stroke-width="2"/>
+        <circle cx="412" cy="456" r="4" fill="#333"/>
+        <circle cx="428" cy="456" r="4" fill="#333"/>
+
+        <!-- Skeleton 3 - Right side, legs kicking up -->
+        <!-- Legs sticking out -->
+        <line x1="620" y1="380" x2="600" y2="280" stroke="#F5DEB3" stroke-width="10" stroke-linecap="round"/>
+        <line x1="620" y1="380" x2="640" y2="270" stroke="#F5DEB3" stroke-width="10" stroke-linecap="round"/>
+        <!-- Feet -->
+        <ellipse cx="598" cy="275" rx="8" ry="12" fill="#F5DEB3" stroke="#333" stroke-width="1" transform="rotate(-20 598 275)"/>
+        <ellipse cx="642" cy="265" rx="8" ry="12" fill="#F5DEB3" stroke="#333" stroke-width="1" transform="rotate(15 642 265)"/>
+        <!-- Skull underground -->
+        <circle cx="640" cy="520" r="18" fill="#FFFACD" stroke="#333" stroke-width="2"/>
+        <circle cx="633" cy="516" r="3.5" fill="#333"/>
+        <circle cx="647" cy="516" r="3.5" fill="#333"/>
+
+        <!-- Skeleton 4 - Far left, just hand sticking out -->
+        <!-- Hand -->
+        <circle cx="80" cy="340" r="8" fill="#F5DEB3" stroke="#333" stroke-width="1"/>
+        <circle cx="70" cy="335" r="6" fill="#F5DEB3" stroke="#333" stroke-width="1"/>
+        <circle cx="75" cy="328" r="6" fill="#F5DEB3" stroke="#333" stroke-width="1"/>
+        <circle cx="85" cy="330" r="6" fill="#F5DEB3" stroke="#333" stroke-width="1"/>
+        <circle cx="92" cy="335" r="6" fill="#F5DEB3" stroke="#333" stroke-width="1"/>
+
+        <!-- Skeleton 5 - Far right, confused tilted skull -->
+        <circle cx="730" cy="430" r="22" fill="#FFFACD" stroke="#333" stroke-width="2" transform="rotate(-25 730 430)"/>
+        <!-- One eye wide, one squinted -->
+        <circle cx="720" cy="424" r="5" fill="#333"/>
+        <line x1="740" y1="427" x2="748" y2="429" stroke="#333" stroke-width="3"/>
+        <!-- Funny expression -->
+        <path d="M 725 438 Q 730 442 735 438" stroke="#333" stroke-width="2" fill="none"/>
+
+        <!-- Random bone scattered -->
+        <line x1="300" y1="520" x2="340" y2="530" stroke="#F5DEB3" stroke-width="8" stroke-linecap="round"/>
+        <circle cx="298" cy="519" r="6" fill="#F5DEB3" stroke="#333" stroke-width="1"/>
+        <circle cx="342" cy="531" r="6" fill="#F5DEB3" stroke="#333" stroke-width="1"/>
+
+        <!-- Rib cage visible -->
+        <ellipse cx="350" cy="480" rx="20" ry="30" fill="none" stroke="#F5DEB3" stroke-width="3"/>
+        <line x1="335" y1="470" x2="365" y2="470" stroke="#F5DEB3" stroke-width="2"/>
+        <line x1="333" y1="480" x2="367" y2="480" stroke="#F5DEB3" stroke-width="2"/>
+        <line x1="335" y1="490" x2="365" y2="490" stroke="#F5DEB3" stroke-width="2"/>
+    </svg>
+</body>
+</html>

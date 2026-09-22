@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Shoe Run</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="start-screen" id="start-screen">
+    <h1 class="game-title">Watch Your Step</h1>
+    <div class="start-buttonrow">
+      <button id="start-play-btn" class="start-btn" type="button">Play</button>
+      <button id="start-help-btn" class="start-btn" type="button">Help</button>
+      <button id="start-about-btn" class="start-btn" type="button">About</button>
+    </div>
+  </div>
+
+  <div class="about-overlay help-overlay" id="about-overlay" hidden>
+    <div class="about-panel help-panel" id="about-panel" role="dialog" aria-modal="true" aria-labelledby="about-title">
+      <div class="help-header">
+        <span id="about-title">About</span>
+        <button id="about-close" type="button" aria-label="Close">&times;</button>
+      </div>
+      <div class="hint">
+        <span>Shit happens.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="help-overlay" id="help-overlay" hidden>
+    <div class="help-panel" id="help-panel" role="dialog" aria-modal="true" aria-labelledby="help-title">
+      <div class="help-header">
+        <span id="help-title">Controls</span>
+        <button id="help-close" type="button" aria-label="Close">&times;</button>
+      </div>
+      <div class="hint">
+        <span><kbd>Space</kbd> / <kbd>&uarr;</kbd> hop over it</span>
+        <span><kbd>&darr;</kbd> duck under flies</span>
+        <span><kbd>&rarr;</kbd> boost speed</span>
+        <span><kbd>M</kbd> mute</span>
+        <span>tap upper area to jump, lower strip to duck</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="help-overlay" id="pause-overlay" hidden>
+    <div class="help-panel" id="pause-panel" role="dialog" aria-modal="true" aria-labelledby="pause-title">
+      <div class="help-header">
+        <span id="pause-title">Paused</span>
+        <button id="pause-close" type="button" aria-label="Close">&times;</button>
+      </div>
+      <div class="start-buttonrow">
+        <button id="pause-continue-btn" class="start-btn" type="button">Continue</button>
+        <button id="pause-restart-btn" class="start-btn" type="button">Restart</button>
+        <button id="pause-mainmenu-btn" class="start-btn" type="button">Back to Main Menu</button>
+        <button id="pause-help-btn" class="start-btn" type="button">Help</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="help-overlay" id="gameover-overlay" hidden>
+    <div class="help-panel" id="gameover-panel" role="dialog" aria-modal="true" aria-labelledby="gameover-title">
+      <div class="help-header">
+        <span id="gameover-title">Game Over</span>
+      </div>
+      <div class="start-buttonrow">
+        <button id="gameover-restart-btn" class="start-btn" type="button">Restart</button>
+        <button id="gameover-mainmenu-btn" class="start-btn" type="button">Back to Main Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap" id="game-wrap" hidden>
+    <div class="controls">
+      <div class="slider-group">
+        <label for="fly-slider">Flies: <span id="fly-value">1.0</span>x</label>
+        <input type="range" id="fly-slider" min="0.1" max="3" step="0.1" value="1" />
+      </div>
+      <div class="slider-group">
+        <label for="pile-slider">Piles: <span id="pile-value">1.0</span>x</label>
+        <input type="range" id="pile-slider" min="0.1" max="3" step="0.1" value="1" />
+      </div>
+      <button id="pause-btn" type="button" aria-haspopup="dialog" aria-controls="pause-panel">Pause</button>
+    </div>
+    <canvas id="game" width="1200" height="420" aria-label="Shoe running game"></canvas>
+  </div>
+
+<script>
+  (function () {
+    window.WYS = window.WYS || {};
+
+    var startScreen = document.getElementById('start-screen');
+    var gameWrap = document.getElementById('game-wrap');
+    var startPlayBtn = document.getElementById('start-play-btn');
+
+    function goToMainMenu() {
+      pauseOverlay.hidden = true;
+      gameoverOverlay.hidden = true;
+      if (window.WYS.backToReady) window.WYS.backToReady();
+      gameWrap.hidden = true;
+      startScreen.hidden = false;
+    }
+
+    startPlayBtn.addEventListener('click', function () {
+      startScreen.hidden = true;
+      gameWrap.hidden = false;
+    });
+
+    // ---- help (shared by the start screen and the pause menu)
+    var helpOverlay = document.getElementById('help-overlay');
+    var helpClose = document.getElementById('help-close');
+    var startHelpBtn = document.getElementById('start-help-btn');
+    var pauseHelpBtn = document.getElementById('pause-help-btn');
+
+    function openHelp() {
+      helpOverlay.hidden = false;
+    }
+    function closeHelp() {
+      helpOverlay.hidden = true;
+    }
+
+    startHelpBtn.addEventListener('click', openHelp);
+    pauseHelpBtn.addEventListener('click', openHelp);
+    helpClose.addEventListener('click', closeHelp);
+    helpOverlay.addEventListener('click', function (e) {
+      if (e.target === helpOverlay) closeHelp();
+    });
+
+    // ---- about
+    var aboutOverlay = document.getElementById('about-overlay');
+    var aboutClose = document.getElementById('about-close');
+    var startAboutBtn = document.getElementById('start-about-btn');
+
+    function openAbout() {
+      aboutOverlay.hidden = false;
+    }
+    function closeAbout() {
+      aboutOverlay.hidden = true;
+    }
+
+    startAboutBtn.addEventListener('click', openAbout);
+    aboutClose.addEventListener('click', closeAbout);
+    aboutOverlay.addEventListener('click', function (e) {
+      if (e.target === aboutOverlay) closeAbout();
+    });
+
+    // ---- pause menu
+    var pauseOverlay = document.getElementById('pause-overlay');
+    var pauseClose = document.getElementById('pause-close');
+    var pauseBtn = document.getElementById('pause-btn');
+    var pauseContinueBtn = document.getElementById('pause-continue-btn');
+    var pauseRestartBtn = document.getElementById('pause-restart-btn');
+    var pauseMainMenuBtn = document.getElementById('pause-mainmenu-btn');
+
+    function openPause() {
+      pauseOverlay.hidden = false;
+      if (window.WYS.pause) window.WYS.pause();
+    }
+    function closePause() {
+      pauseOverlay.hidden = true;
+      if (window.WYS.resume) window.WYS.resume();
+    }
+
+    pauseBtn.addEventListener('click', openPause);
+    pauseClose.addEventListener('click', closePause);
+    pauseContinueBtn.addEventListener('click', closePause);
+    pauseOverlay.addEventListener('click', function (e) {
+      if (e.target === pauseOverlay) closePause();
+    });
+    pauseRestartBtn.addEventListener('click', function () {
+      pauseOverlay.hidden = true;
+      if (window.WYS.restart) window.WYS.restart();
+    });
+    pauseMainMenuBtn.addEventListener('click', goToMainMenu);
+
+    // ---- game over
+    var gameoverOverlay = document.getElementById('gameover-overlay');
+    var gameoverRestartBtn = document.getElementById('gameover-restart-btn');
+    var gameoverMainMenuBtn = document.getElementById('gameover-mainmenu-btn');
+
+    window.WYS.onGameOver = function () {
+      gameoverOverlay.hidden = false;
+    };
+    window.WYS.onRestart = function () {
+      gameoverOverlay.hidden = true;
+    };
+
+    gameoverRestartBtn.addEventListener('click', function () {
+      if (window.WYS.restart) window.WYS.restart();
+    });
+    gameoverMainMenuBtn.addEventListener('click', goToMainMenu);
+
+    window.addEventListener('keydown', function (e) {
+      if (e.code !== 'Escape') return;
+      if (!helpOverlay.hidden) { closeHelp(); return; }
+      if (!aboutOverlay.hidden) { closeAbout(); return; }
+      if (!pauseOverlay.hidden) { closePause(); return; }
+    });
+  })();
+</script>
+<script src="js/game.js"></script>
+</body>
+</html>
